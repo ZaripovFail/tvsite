@@ -14,42 +14,15 @@
             -webkit-font-smoothing: antialiased;
         }
 
+        /* Премиальный глубокий графитовый градиент */
         body {
-            background-color: #0a0a0a;
+            background: radial-gradient(circle at 80% 20%, #1c1d21 0%, #0c0d0f 60%, #050507 100%);
             color: #e5e5e5;
             font-family: 'Inter', sans-serif;
             overflow: hidden;
             width: 1920px;
             height: 1080px;
             position: relative;
-        }
-
-        /* Фоновая видеозона */
-        .video-background {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 1920px;
-            height: 1080px;
-            z-index: 1;
-            background: #000;
-        }
-
-        .video-background iframe {
-            width: 100%;
-            height: 100%;
-            border: none;
-        }
-
-        /* Премиальная тонировка */
-        .video-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, rgba(10,10,10,0.95) 0%, rgba(10,10,10,0.85) 30%, rgba(10,10,10,0.4) 100%);
-            z-index: 2;
         }
 
         /* Контентный слой */
@@ -63,7 +36,7 @@
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            padding: 80px 100px;
+            padding: 90px 110px;
         }
 
         .header-zone {
@@ -96,11 +69,11 @@
         .time-display {
             font-family: 'Inter', sans-serif;
             font-weight: 200;
-            font-size: 110px;
+            font-size: 115px;
             line-height: 1;
             letter-spacing: -2px;
             color: #ffffff;
-            text-shadow: 0 0 20px rgba(255,255,255,0.1);
+            text-shadow: 0 0 30px rgba(255,255,255,0.05);
         }
 
         .date-display {
@@ -110,13 +83,13 @@
             text-transform: uppercase;
             letter-spacing: 5px;
             color: #8e8e93;
-            margin-top: 15px;
+            margin-top: 18px;
         }
 
         .divider {
             width: 1px;
-            height: 90px;
-            background: rgba(255, 255, 255, 0.1);
+            height: 95px;
+            background: rgba(255, 255, 255, 0.08);
             align-self: flex-end;
             margin-bottom: 10px;
         }
@@ -130,13 +103,13 @@
         .weather-temp {
             font-family: 'Inter', sans-serif;
             font-weight: 200;
-            font-size: 64px;
+            font-size: 68px;
             line-height: 1;
             color: #ffffff;
         }
 
         .weather-temp span {
-            font-size: 36px;
+            font-size: 38px;
             vertical-align: super;
             font-weight: 300;
             color: #8e8e93;
@@ -149,33 +122,25 @@
             text-transform: uppercase;
             letter-spacing: 4px;
             color: #8e8e93;
-            margin-top: 20px;
+            margin-top: 22px;
         }
     </style>
 </head>
 <body>
 
-    <!-- Фоновое видео из Rutube -->
-    <div class="video-background">
-        <!-- 
-           ВНИМАНИЕ: Обязательно вставьте вместо слов ВАШ_ИД реальный ID видео.
-           Параметры изменены для гарантированного обхода блокировок браузера ТВ.
-        -->
-        <iframe src="https://rutube.ru" allow="autoplay; encrypted-media" allowfullscreen></iframe>
-    </div>
-
-    <div class="video-overlay"></div>
-
     <div class="interface-layer">
         
+        <!-- Логотип компании -->
         <div class="header-zone">
             <div class="logo-container">
-                <img src="logo.png" alt="Company Logo">
+                <img src="logo.png" alt="Company Logo" onerror="this.style.opacity='0.3';">
             </div>
         </div>
 
+        <!-- Информационные виджеты -->
         <div class="footer-widgets">
             
+            <!-- Часы и дата -->
             <div class="widget-clock">
                 <div class="time-display" id="clock-time">00:00</div>
                 <div class="date-display" id="clock-date">Понедельник, 1 января</div>
@@ -183,32 +148,34 @@
 
             <div class="divider"></div>
 
+            <!-- Погода (Казань) -->
             <div class="widget-weather">
-                <div class="weather-temp" id="weather-degree">+0<span>°C</span></div>
-                <div class="weather-status" id="weather-desc">Казань</div>
+                <div class="weather-temp" id="weather-degree">--<span>°C</span></div>
+                <div class="weather-status" id="weather-desc">Обновление данных</div>
             </div>
 
         </div>
     </div>
 
     <script>
-        // --- 1. Часы по Москве ---
+        // --- 1. Работа часов и даты по Москве ---
         function updateDateTime() {
-            const now = new Date();
-            const timeOptions = { timeZone: 'Europe/Moscow', hour: '2-digit', minute: '2-digit', hour12: false };
+            var now = new Date();
+            var timeOptions = { timeZone: 'Europe/Moscow', hour: '2-digit', minute: '2-digit', hour12: false };
             document.getElementById('clock-time').innerText = new Intl.DateTimeFormat('ru-RU', timeOptions).format(now);
 
-            const dateOptions = { timeZone: 'Europe/Moscow', weekday: 'long', day: 'numeric', month: 'long' };
-            let dateString = new Intl.DateTimeFormat('ru-RU', dateOptions).format(now);
+            var dateOptions = { timeZone: 'Europe/Moscow', weekday: 'long', day: 'numeric', month: 'long' };
+            var dateString = new Intl.DateTimeFormat('ru-RU', dateOptions).format(now);
             dateString = dateString.charAt(0).toUpperCase() + dateString.slice(1);
             document.getElementById('clock-date').innerText = dateString;
         }
+        
         setInterval(updateDateTime, 1000);
         updateDateTime();
 
 
-        // --- 2. Погода (Казань) через старый совместимый метод запросов ---
-        const weatherCodes = {
+        // --- 2. Погода для Казани (Улучшенный и совместимый метод) ---
+        var weatherCodes = {
             0: 'Ясно', 1: 'Преимущественно ясно', 2: 'Переменная облачность', 3: 'Пасмурно',
             45: 'Туман', 48: 'Иней с туманом', 51: 'Легкая морось', 53: 'Морось', 55: 'Плотная морось',
             61: 'Слабый дождь', 63: 'Умеренный дождь', 65: 'Сильный дождь', 71: 'Слабый снегопад',
@@ -218,20 +185,34 @@
 
         function fetchWeather() {
             var xhr = new XMLHttpRequest();
-            // Запрос идет по HTTP протоколу, совместимому со старыми ТВ
-            xhr.open('GET', 'https://open-meteo.com', true);
+            // Используем оптимизированный URL-запрос для жесткой совместимости с ТВ
+            var url = 'https://open-meteo.com';
+            
+            xhr.open('GET', url, true);
+            xhr.setRequestHeader('Accept', 'application/json');
             
             xhr.onreadystatechange = function () {
-                if (xhr.readyState === 4 && xhr.status === 200) {
-                    try {
-                        var data = JSON.parse(xhr.responseText);
-                        var temp = Math.round(data.current_weather.temperature);
-                        var code = data.current_weather.weathercode;
-                        
-                        var displayTemp = temp > 0 ? '+' + temp : temp;
-                        document.getElementById('weather-degree').innerHTML = displayTemp + '<span>°C</span>';
-                        document.getElementById('weather-desc').innerText = weatherCodes[code] || 'Казань';
-                    } catch (e) {
+                if (xhr.readyState === 4) {
+                    if (xhr.status === 200) {
+                        try {
+                            var data = JSON.parse(xhr.responseText);
+                            if (data && data.current_weather) {
+                                var temp = Math.round(data.current_weather.temperature);
+                                var code = data.current_weather.weathercode;
+                                
+                                // Выводим знак плюс для положительной температуры
+                                var displayTemp = temp > 0 ? '+' + temp : temp;
+                                
+                                document.getElementById('weather-degree').innerHTML = displayTemp + '<span>°C</span>';
+                                document.getElementById('weather-desc').innerText = weatherCodes[code] || 'Казань';
+                            } else {
+                                document.getElementById('weather-desc').innerText = 'Казань';
+                            }
+                        } catch (e) {
+                            document.getElementById('weather-desc').innerText = 'Казань';
+                        }
+                    } else {
+                        // Ошибка сервера — убираем прочерки и пишем город
                         document.getElementById('weather-desc').innerText = 'Казань';
                     }
                 }
@@ -239,14 +220,15 @@
             xhr.send();
         }
 
+        // Обновление погоды каждые 30 минут
         setInterval(fetchWeather, 1800000);
         fetchWeather();
 
 
-        // --- 3. Автоматическая перезагрузка страницы раз в 4 часа ---
+        // --- 3. Автоматическая перезагрузка страницы раз в 12 часов ---
         setTimeout(function() {
             window.location.reload();
-        }, 4 * 60 * 60 * 1000);
+        }, 12 * 60 * 60 * 1000);
 
     </script>
 </body>
